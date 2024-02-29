@@ -7,11 +7,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.siddhant.blog.config.JwtProvider;
 import com.siddhant.blog.entities.User;
 import com.siddhant.blog.exceptions.ResourceNotFoundException;
 import com.siddhant.blog.payloads.UserDTo;
 import com.siddhant.blog.repositories.UserRepo;
 import com.siddhant.blog.services.UserService;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -20,14 +22,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ModelMapper modelMapper;
 	
-	@Override
-	public UserDTo createUser(UserDTo userDto) {
-		
-		User user = this.dtoToUser(userDto);
-		User savedUser=this.userRepo.save(user);
-		return this.userToDto(savedUser);
-		
-	}
+	
 
 	@Override
 	public UserDTo updateUser(UserDTo userDto, Integer userId) {
@@ -81,6 +76,34 @@ public class UserServiceImpl implements UserService {
 		return userDto;
 		
 		
+	}
+
+	@Override
+	public UserDTo registerUser(UserDTo userDto) {
+		User user = this.dtoToUser(userDto);
+		User savedUser=this.userRepo.save(user);
+		return this.userToDto(savedUser);
+		
+	}
+
+	@Override
+	public UserDTo findUserByEmail(String email) {
+		UserDTo user=userRepo.findByEmail(email);
+		return user;
+		
+	}
+
+	@Override
+	public List<UserDTo> searchUser(String query) {
+		return userRepo.searchUser(query);
+	}
+
+	@Override
+	public UserDTo findUserByJwt(String jwt) {
+		String email=JwtProvider.getEmailFromJwtToken(jwt);
+		UserDTo user=userRepo.findByEmail(email);
+		
+		return user;
 	}
 
 }
